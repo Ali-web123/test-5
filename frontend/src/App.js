@@ -767,9 +767,6 @@ const CourseDetail = () => {
                       </div>
                       <p className="text-green-200 text-sm">
                         Congratulations! You've earned a skill badge for completing "{course.title}".
-                        {getQuizScore() >= 90 && " Amazing performance! 🏆"}
-                        {getQuizScore() >= 80 && getQuizScore() < 90 && " Great work! 🥈"}
-                        {getQuizScore() >= 70 && getQuizScore() < 80 && " Well done! 🥉"}
                       </p>
                       <p className="text-green-300 text-xs mt-2">
                         Check your profile to see all your badges!
