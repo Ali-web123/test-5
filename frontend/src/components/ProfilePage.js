@@ -238,6 +238,11 @@ const ProfilePage = () => {
         <div className="glass-card p-8 mt-8">
           <BadgeCollection showTitle={true} />
         </div>
+
+        {/* Uploaded Courses Section */}
+        <div className="glass-card p-8 mt-8">
+          <UploadedCourses showTitle={true} />
+        </div>
       </div>
     </div>
   );
