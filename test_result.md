@@ -167,15 +167,18 @@ backend:
 
   - task: "Course Management API"
     implemented: true
-    working: "needs_testing"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "needs_testing"
         agent: "main"
         comment: "Full CRUD operations for courses including creation, publishing, and deletion. User-specific course management."
+      - working: true
+        agent: "testing"
+        comment: "Course management API is working correctly. The /api/courses endpoint creates courses for authenticated users. The /api/courses/created endpoint returns courses created by the current user. The /api/courses/created/{user_id} endpoint returns published courses for a specific user. The /api/courses/{course_id} endpoint returns a specific course. The /api/courses/{course_id} PUT endpoint updates a course. The /api/courses/{course_id}/publish endpoint publishes a course. The /api/courses/{course_id} DELETE endpoint deletes a course."
 
   - task: "MongoDB Connection"
     implemented: true
