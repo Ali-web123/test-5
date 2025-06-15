@@ -1343,6 +1343,14 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/upload-course" 
+              element={
+                <ProtectedRoute>
+                  <CourseUpload />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/masterclasses" element={
               <CoursePage
                 type="masterclasses"
