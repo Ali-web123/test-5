@@ -6,6 +6,7 @@ import AuthCallback from "./components/AuthCallback";
 import LoginButton from "./components/LoginButton";
 import ProfilePage from "./components/ProfilePage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CourseUpload from "./components/CourseUpload";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
