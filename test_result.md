@@ -182,7 +182,7 @@ frontend:
     status_history:
       - working: true
         agent: "main"
-        comment: "Created visual badge component with different colors based on quiz score"
+        comment: "Updated to uniform blue design, removed score display, added course title below badge"
 
   - task: "BadgeCollection Component"
     implemented: true
@@ -194,7 +194,19 @@ frontend:
     status_history:
       - working: true
         agent: "main"
-        comment: "Created badge collection display with statistics and grid layout"
+        comment: "Removed score-based statistics, added course name display, simplified grid layout"
+
+  - task: "UploadedCourses Component"
+    implemented: true
+    working: true
+    file: "frontend/src/components/UploadedCourses.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Created new component to display user-created courses with placeholder functionality"
 
   - task: "Profile Page Badge Integration"
     implemented: true
