@@ -641,8 +641,43 @@ const CourseDetail = () => {
     }));
   };
 
-  const submitQuiz = () => {
+  const submitQuiz = async () => {
+    const score = getQuizScore();
     setQuizCompleted(true);
+    
+    // Award badge if user is authenticated and scores above 60%
+    if (isAuthenticated && score >= 60 && !badgeAwarded) {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/badges`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeaders()
+          },
+          body: JSON.stringify({
+            course_id: parseInt(courseId),
+            course_category: category,
+            quiz_score: score
+          })
+        });
+
+        if (response.ok) {
+          const badge = await response.json();
+          // Update badge with course title
+          await fetch(`${BACKEND_URL}/api/badges/${badge.id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              ...getAuthHeaders()
+            },
+            body: JSON.stringify(course.title)
+          });
+          setBadgeAwarded(true);
+        }
+      } catch (error) {
+        console.error('Failed to award badge:', error);
+      }
+    }
   };
 
   const getQuizScore = () => {
