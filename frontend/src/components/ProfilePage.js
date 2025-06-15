@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import BadgeCollection from './BadgeCollection';
 
 const ProfilePage = () => {
   const { user, logout, updateProfile } = useAuth();
