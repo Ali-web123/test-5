@@ -1263,6 +1263,16 @@ const Navigation = () => {
           </button>
         ))}
         
+        {/* Create Course Tab */}
+        {isAuthenticated && (
+          <button
+            onClick={() => navigate('/upload-course')}
+            className="px-6 py-3 rounded-lg text-sm font-medium bg-orange-500/20 text-orange-300 hover:bg-orange-500/30 border border-orange-400/50 transition-all duration-300"
+          >
+            Create Course
+          </button>
+        )}
+        
         {/* Profile/Login Button */}
         {isAuthenticated ? (
           <button
