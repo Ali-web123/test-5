@@ -230,7 +230,7 @@ frontend:
     status_history:
       - working: true
         agent: "main"
-        comment: "Modified quiz completion logic to award badges for scores >= 60%"
+        comment: "Modified quiz completion logic to award uniform badges for scores >= 60%, removed score-based messaging"
 
   - task: "Auth Context Enhancement"
     implemented: true
