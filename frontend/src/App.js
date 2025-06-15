@@ -1293,6 +1293,8 @@ const HomePage = () => {
   const masterclassVideos = courseData.masterclasses.slice(0, 3);
   const careerPathVideos = courseData.careerpaths.slice(0, 3);
   const crashCourseVideos = courseData.crashcourses.slice(0, 3);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -1321,6 +1323,93 @@ const HomePage = () => {
         videos={crashCourseVideos}
         gradient="135deg, rgba(245, 101, 101, 0.4) 0%, rgba(251, 191, 36, 0.4) 100%"
       />
+      
+      {/* Course Upload Section */}
+      <section 
+        id="upload-course"
+        className="min-h-screen relative flex items-center justify-center px-6 py-20"
+        style={{
+          backgroundImage: `linear-gradient(135deg, rgba(139, 69, 19, 0.4) 0%, rgba(160, 82, 45, 0.4) 100%), url(https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHw5fHx0ZWFjaGluZ3xlbnwwfHx8YmxhY2t8MTc0OTc0MzU4NHww&ixlib=rb-4.1.0&q=85)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
+        
+        <div className="relative z-10 max-w-4xl mx-auto w-full text-center">
+          <div className="glass-card p-12">
+            <div className="mb-8">
+              <svg className="w-20 h-20 text-white mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+              <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight">
+                Share Your Knowledge
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed mb-8">
+                Join our community of instructors and create courses that inspire and educate. Share your expertise with learners around the world.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                  </svg>
+                </div>
+                <h3 className="text-white font-semibold mb-2">Share Expertise</h3>
+                <p className="text-gray-300 text-sm">Turn your knowledge into comprehensive learning experiences</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                  </svg>
+                </div>
+                <h3 className="text-white font-semibold mb-2">Impact Learners</h3>
+                <p className="text-gray-300 text-sm">Help students achieve their goals and advance their careers</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                </div>
+                <h3 className="text-white font-semibold mb-2">Easy Creation</h3>
+                <p className="text-gray-300 text-sm">User-friendly tools to create professional courses quickly</p>
+              </div>
+            </div>
+
+            {isAuthenticated ? (
+              <button
+                onClick={() => navigate('/upload-course')}
+                className="glass-button bg-orange-500/20 border-orange-400 text-orange-300 hover:bg-orange-500/30 px-8 py-4 text-lg"
+              >
+                <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Create Your Course
+              </button>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-gray-300 mb-4">Sign in to start creating and sharing your courses</p>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="glass-button bg-orange-500/20 border-orange-400 text-orange-300 hover:bg-orange-500/30 px-8 py-4 text-lg"
+                >
+                  <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                  </svg>
+                  Sign In to Create Course
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
     </>
   );
 };
