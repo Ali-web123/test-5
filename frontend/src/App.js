@@ -757,6 +757,43 @@ const CourseDetail = () => {
                   <p className="text-gray-300">
                     You got {Object.values(quizAnswers).filter((answer, index) => answer === course.quiz.questions[index].correct).length} out of {course.quiz.questions.length} questions correct.
                   </p>
+                  
+                  {/* Badge Awarded Message */}
+                  {isAuthenticated && getQuizScore() >= 60 && (
+                    <div className="mt-6 p-4 bg-green-500/20 border border-green-400 rounded-lg">
+                      <div className="flex items-center justify-center mb-2">
+                        <span className="text-4xl mr-2">🎖️</span>
+                        <h4 className="text-green-300 font-semibold text-lg">Badge Earned!</h4>
+                      </div>
+                      <p className="text-green-200 text-sm">
+                        Congratulations! You've earned a skill badge for completing "{course.title}".
+                        {getQuizScore() >= 90 && " Amazing performance! 🏆"}
+                        {getQuizScore() >= 80 && getQuizScore() < 90 && " Great work! 🥈"}
+                        {getQuizScore() >= 70 && getQuizScore() < 80 && " Well done! 🥉"}
+                      </p>
+                      <p className="text-green-300 text-xs mt-2">
+                        Check your profile to see all your badges!
+                      </p>
+                    </div>
+                  )}
+                  
+                  {!isAuthenticated && getQuizScore() >= 60 && (
+                    <div className="mt-6 p-4 bg-blue-500/20 border border-blue-400 rounded-lg">
+                      <div className="flex items-center justify-center mb-2">
+                        <span className="text-4xl mr-2">🔐</span>
+                        <h4 className="text-blue-300 font-semibold text-lg">Sign in to earn badges!</h4>
+                      </div>
+                      <p className="text-blue-200 text-sm">
+                        Great score! Sign in to earn skill badges and track your progress.
+                      </p>
+                      <button
+                        onClick={() => navigate('/login')}
+                        className="mt-2 glass-button bg-blue-500/30 border-blue-400 text-blue-300"
+                      >
+                        Sign In Now
+                      </button>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="flex justify-center gap-4">
