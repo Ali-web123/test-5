@@ -27,6 +27,39 @@ print(f"Using API URL: {API_URL}")
 # JWT Secret for creating test tokens
 JWT_SECRET = os.environ.get('SECRET_KEY', 'your-super-secret-jwt-key-here-make-it-very-long-and-random-for-production')
 
+# MongoDB connection test
+def test_mongodb_connection():
+    """Test MongoDB connection by checking the status endpoint"""
+    try:
+        # Create a status check
+        status_data = {"client_name": "backend_test.py"}
+        response = requests.post(f"{API_URL}/status", json=status_data)
+        print(f"MongoDB status check creation response: {response.status_code}")
+        
+        if response.status_code == 200:
+            # Get status checks
+            response = requests.get(f"{API_URL}/status")
+            print(f"MongoDB status check retrieval response: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list) and len(data) > 0:
+                    print("✅ MongoDB connection test passed")
+                    return True
+                else:
+                    print("❌ MongoDB connection test failed: No status checks found")
+                    return False
+            else:
+                print(f"❌ MongoDB connection test failed: Could not retrieve status checks, status code: {response.status_code}")
+                return False
+        else:
+            print(f"❌ MongoDB connection test failed: Could not create status check, status code: {response.status_code}")
+            return False
+    except Exception as e:
+        print(f"❌ MongoDB connection test failed: {str(e)}")
+        traceback.print_exc()
+        return False
+
 class TestGoogleOAuth(unittest.TestCase):
     
     def create_test_token(self, sub="test_google_id", email="test@example.com", name="Test User", expired=False):
