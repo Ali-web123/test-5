@@ -137,15 +137,18 @@ backend:
 
   - task: "User Profile Management API"
     implemented: true
-    working: "needs_testing"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "needs_testing"
         agent: "main"
         comment: "Complete user profile CRUD operations including profile updates. Stores user data from Google OAuth in MongoDB."
+      - working: true
+        agent: "testing"
+        comment: "User profile management API is working correctly. The /api/auth/me endpoint returns user profile data for authenticated users and rejects unauthorized requests. The /api/auth/profile endpoint allows updating user profiles with proper authentication."
 
   - task: "Badge/Achievement System API"
     implemented: true
