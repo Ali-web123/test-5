@@ -75,17 +75,6 @@ const BadgeCollection = ({ userId, showTitle = true, maxDisplay = null }) => {
 
   const displayBadges = maxDisplay ? badges.slice(0, maxDisplay) : badges;
 
-  const getBadgeStats = () => {
-    const total = badges.length;
-    const gold = badges.filter(b => b.quiz_score >= 90).length;
-    const silver = badges.filter(b => b.quiz_score >= 80 && b.quiz_score < 90).length;
-    const bronze = badges.filter(b => b.quiz_score >= 70 && b.quiz_score < 80).length;
-    
-    return { total, gold, silver, bronze };
-  };
-
-  const stats = getBadgeStats();
-
   return (
     <div className="space-y-6">
       {showTitle && (
@@ -93,21 +82,19 @@ const BadgeCollection = ({ userId, showTitle = true, maxDisplay = null }) => {
           <h3 className="text-2xl font-bold text-white mb-2">
             {userId ? 'Skill Badges' : 'Your Badges'}
           </h3>
-          <div className="flex justify-center gap-4 text-sm">
-            <span className="text-yellow-400">🏆 {stats.gold} Gold</span>
-            <span className="text-gray-300">🥈 {stats.silver} Silver</span>
-            <span className="text-amber-600">🥉 {stats.bronze} Bronze</span>
-            <span className="text-gray-400">Total: {stats.total}</span>
-          </div>
+          <p className="text-gray-400 text-sm">
+            Total Badges Earned: {badges.length}
+          </p>
         </div>
       )}
 
-      <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 justify-items-center">
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 justify-items-center">
         {displayBadges.map((badge) => (
           <Badge
             key={badge.id}
             badge={badge}
             size="md"
+            showTitle={true}
           />
         ))}
       </div>
