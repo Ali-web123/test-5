@@ -598,11 +598,13 @@ const VideoCard = ({ title, description, duration, views, instructor, level, tag
 const CourseDetail = () => {
   const { category, courseId } = useParams();
   const navigate = useNavigate();
+  const { isAuthenticated, getAuthHeaders } = useAuth();
   const [currentSession, setCurrentSession] = useState(1);
   const [completedSessions, setCompletedSessions] = useState(new Set());
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState({});
   const [quizCompleted, setQuizCompleted] = useState(false);
+  const [badgeAwarded, setBadgeAwarded] = useState(false);
 
   const course = courseData[category]?.find(c => c.id === parseInt(courseId));
 
