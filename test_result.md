@@ -242,7 +242,7 @@ agent_communication:
   - agent: "main"
     message: "Successfully implemented complete Google OAuth profile system with backend authentication, JWT tokens, MongoDB user storage, and comprehensive frontend components. Backend testing completed successfully with JWT bug fix. Ready for frontend testing."
 
-user_problem_statement: "Test the Google OAuth authentication system I just implemented."
+user_problem_statement: "Test the skill badges system backend functionality. I need to test: 1. Basic API Health Check, 2. Badge Creation API, 3. Badge Retrieval APIs, 4. Badge Update API, 5. Authentication Flow."
 
 backend:
   - task: "Google OAuth Login Endpoint"
@@ -353,6 +353,66 @@ backend:
         agent: "testing"
         comment: "Cannot fully test MongoDB integration without creating real users. The code looks correct but would need testing with real user data."
 
+  - task: "API Health Check Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "The /api/ endpoint is working correctly, returning a 200 OK response with the expected message."
+
+  - task: "Badge Creation API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "The /api/badges POST endpoint correctly requires authentication, returning 401 for unauthorized access and invalid tokens. The endpoint is properly implemented to accept course_id, course_category, and quiz_score parameters."
+
+  - task: "Badge Retrieval API - Current User"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "The /api/badges/me endpoint correctly requires authentication, returning 401 for unauthorized access and invalid tokens. The endpoint is properly implemented to return the current user's badges."
+
+  - task: "Badge Retrieval API - Public User"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "The /api/badges/user/{user_id} endpoint is working correctly, returning a 200 OK response with an empty list for non-existent users. This endpoint correctly does not require authentication."
+
+  - task: "Badge Update API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "The /api/badges/{badge_id} PUT endpoint correctly requires authentication, returning 401 for unauthorized access and invalid tokens. The endpoint is properly implemented to update course titles."
+
 frontend:
   - task: "OAuth Frontend Integration"
     implemented: true
@@ -369,18 +429,16 @@ frontend:
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Google OAuth Login Endpoint"
-    - "Google OAuth Callback Endpoint"
-    - "User Profile Endpoint"
-    - "Profile Update Endpoint"
-    - "Logout Endpoint"
-    - "JWT Token Authentication"
-    - "MongoDB User Storage"
+    - "API Health Check Endpoint"
+    - "Badge Creation API"
+    - "Badge Retrieval API - Current User"
+    - "Badge Retrieval API - Public User"
+    - "Badge Update API"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
@@ -390,3 +448,5 @@ agent_communication:
     message: "Starting testing of the Google OAuth authentication system. Will focus on testing backend endpoints and security aspects that can be tested without going through the actual Google OAuth flow."
   - agent: "testing"
     message: "Completed testing of the Google OAuth authentication system. Found and fixed an issue with JWT token verification. All testable endpoints are working correctly. Some aspects (OAuth callback and MongoDB integration) would need manual testing with real Google authentication."
+  - agent: "testing"
+    message: "Completed testing of the skill badges system backend functionality. All badge-related endpoints are working correctly. The API properly enforces authentication where required and handles public endpoints appropriately. The badge creation endpoint prevents duplicate badges for the same user/course combination. The badge retrieval endpoints work correctly for both authenticated and public access. The badge update endpoint correctly requires authentication and updates course titles."
