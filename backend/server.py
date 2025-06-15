@@ -297,6 +297,92 @@ async def update_badge_course_title(
     
     return Badge(**updated_badge)
 
+# Course endpoints
+@api_router.post("/courses", response_model=Course)
+async def create_course(
+    course_data: CourseCreate,
+    current_user: UserProfile = Depends(get_current_user)
+):
+    # Create course with user as instructor
+    course = Course(
+        **course_data.dict(),
+        instructor=current_user.name,
+        created_by=current_user.id
+    )
+    
+    await db.courses.insert_one(course.dict())
+    return course
+
+@api_router.get("/courses/created", response_model=List[Course])
+async def get_user_created_courses(current_user: UserProfile = Depends(get_current_user)):
+    courses = await db.courses.find({"created_by": current_user.id}).to_list(1000)
+    return [Course(**course) for course in courses]
+
+@api_router.get("/courses/created/{user_id}", response_model=List[Course])
+async def get_courses_by_user(user_id: str):
+    courses = await db.courses.find({"created_by": user_id, "published": True}).to_list(1000)
+    return [Course(**course) for course in courses]
+
+@api_router.get("/courses/{course_id}", response_model=Course)
+async def get_course(course_id: str):
+    course = await db.courses.find_one({"id": course_id})
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+    return Course(**course)
+
+@api_router.put("/courses/{course_id}", response_model=Course)
+async def update_course(
+    course_id: str,
+    course_data: CourseCreate,
+    current_user: UserProfile = Depends(get_current_user)
+):
+    # Check if user owns the course
+    existing_course = await db.courses.find_one({"id": course_id, "created_by": current_user.id})
+    if not existing_course:
+        raise HTTPException(status_code=404, detail="Course not found or unauthorized")
+    
+    # Update course
+    await db.courses.update_one(
+        {"id": course_id},
+        {"$set": course_data.dict()}
+    )
+    
+    updated_course = await db.courses.find_one({"id": course_id})
+    return Course(**updated_course)
+
+@api_router.put("/courses/{course_id}/publish")
+async def publish_course(
+    course_id: str,
+    current_user: UserProfile = Depends(get_current_user)
+):
+    # Check if user owns the course
+    existing_course = await db.courses.find_one({"id": course_id, "created_by": current_user.id})
+    if not existing_course:
+        raise HTTPException(status_code=404, detail="Course not found or unauthorized")
+    
+    # Publish course
+    await db.courses.update_one(
+        {"id": course_id},
+        {"$set": {"published": True}}
+    )
+    
+    return {"message": "Course published successfully"}
+
+@api_router.delete("/courses/{course_id}")
+async def delete_course(
+    course_id: str,
+    current_user: UserProfile = Depends(get_current_user)
+):
+    # Check if user owns the course
+    existing_course = await db.courses.find_one({"id": course_id, "created_by": current_user.id})
+    if not existing_course:
+        raise HTTPException(status_code=404, detail="Course not found or unauthorized")
+    
+    # Delete course
+    await db.courses.delete_one({"id": course_id})
+    
+    return {"message": "Course deleted successfully"}
+
 # Existing routes
 @api_router.get("/")
 async def root():
