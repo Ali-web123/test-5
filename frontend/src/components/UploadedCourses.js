@@ -111,11 +111,57 @@ const UploadedCourses = ({ userId, showTitle = true }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course) => (
             <div key={course.id} className="glass-card p-6 hover:bg-white/10 transition-all duration-300">
-              <h4 className="text-white font-semibold mb-2">{course.title}</h4>
+              <div className="flex justify-between items-start mb-2">
+                <h4 className="text-white font-semibold">{course.title}</h4>
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  course.published 
+                    ? 'bg-green-500/20 text-green-300 border border-green-400'
+                    : 'bg-yellow-500/20 text-yellow-300 border border-yellow-400'
+                }`}>
+                  {course.published ? 'Published' : 'Draft'}
+                </span>
+              </div>
               <p className="text-gray-300 text-sm mb-4 line-clamp-3">{course.description}</p>
-              <div className="flex justify-between items-center text-xs text-gray-400">
-                <span>{course.duration}</span>
-                <span>{course.students} students</span>
+              <div className="space-y-2 mb-4">
+                <div className="flex justify-between items-center text-xs text-gray-400">
+                  <span>{course.duration}</span>
+                  <span>{course.views} views</span>
+                </div>
+                <div className="flex justify-between items-center text-xs text-gray-400">
+                  <span>{course.level}</span>
+                  <span className="capitalize">{course.category}</span>
+                </div>
+                <div className="flex justify-between items-center text-xs text-gray-400">
+                  <span>{course.sessions?.length || 0} sessions</span>
+                  <span>{course.quiz?.questions?.length || 0} quiz questions</span>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-1 mb-4">
+                {course.tags?.slice(0, 3).map((tag, index) => (
+                  <span key={index} className="text-xs bg-white/10 text-gray-300 px-2 py-1 rounded-full">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => navigate(`/${course.category}/${course.id}`)}
+                  className="flex-1 glass-button bg-blue-500/20 border-blue-400 text-blue-300 hover:bg-blue-500/30 text-sm py-2"
+                >
+                  View
+                </button>
+                {!userId && (
+                  <>
+                    <button className="glass-button bg-gray-500/20 border-gray-400 text-gray-300 hover:bg-gray-500/30 text-sm py-2">
+                      Edit
+                    </button>
+                    {!course.published && (
+                      <button className="glass-button bg-green-500/20 border-green-400 text-green-300 hover:bg-green-500/30 text-sm py-2">
+                        Publish
+                      </button>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           ))}
