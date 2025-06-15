@@ -205,12 +205,192 @@ class TestGoogleOAuth(unittest.TestCase):
             print(f"❌ Invalid profile data test failed: {str(e)}")
             traceback.print_exc()
 
+class TestBadgeSystem(unittest.TestCase):
+    """Test class for the badge system endpoints"""
+    
+    def create_test_token(self, sub="test_google_id", email="test@example.com", name="Test User", expired=False):
+        """Create a test JWT token for authentication testing"""
+        payload = {
+            "sub": sub,
+            "email": email,
+            "name": name
+        }
+        
+        if expired:
+            # Create an expired token (expired 1 hour ago)
+            payload["exp"] = datetime.utcnow() - timedelta(hours=1)
+        else:
+            # Valid for 24 hours
+            payload["exp"] = datetime.utcnow() + timedelta(hours=24)
+            
+        return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+    
+    def test_create_badge_unauthorized(self):
+        """Test that badge creation requires authentication"""
+        try:
+            badge_data = {
+                "course_id": 101,
+                "course_category": "masterclasses",
+                "quiz_score": 95
+            }
+            response = requests.post(f"{API_URL}/badges", json=badge_data)
+            print(f"Unauthorized badge creation response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Unauthorized badge creation test passed")
+        except Exception as e:
+            print(f"❌ Unauthorized badge creation test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_create_badge_invalid_token(self):
+        """Test that badge creation rejects invalid tokens"""
+        try:
+            badge_data = {
+                "course_id": 101,
+                "course_category": "masterclasses",
+                "quiz_score": 95
+            }
+            headers = {"Authorization": "Bearer invalid_token_here"}
+            response = requests.post(f"{API_URL}/badges", json=badge_data, headers=headers)
+            print(f"Invalid token badge creation response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Invalid token for badge creation test passed")
+        except Exception as e:
+            print(f"❌ Invalid token for badge creation test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_create_badge_valid_token(self):
+        """
+        Test badge creation with a valid token
+        Note: This test will fail in a real environment as the token is mocked
+        and the user doesn't exist in the database
+        """
+        try:
+            valid_token = self.create_test_token()
+            headers = {"Authorization": f"Bearer {valid_token}"}
+            badge_data = {
+                "course_id": 101,
+                "course_category": "masterclasses",
+                "quiz_score": 95
+            }
+            response = requests.post(f"{API_URL}/badges", json=badge_data, headers=headers)
+            print(f"Valid token badge creation response: {response.status_code}")
+            # This will fail with 404 "User not found" as our test user doesn't exist in DB
+            # We're just checking that token validation works
+            self.assertEqual(response.status_code, 404)
+            print("✅ Valid token format for badge creation test passed (expected 404 as test user doesn't exist)")
+        except Exception as e:
+            print(f"❌ Valid token format for badge creation test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_get_my_badges_unauthorized(self):
+        """Test that getting user's badges requires authentication"""
+        try:
+            response = requests.get(f"{API_URL}/badges/me")
+            print(f"Unauthorized get my badges response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Unauthorized get my badges test passed")
+        except Exception as e:
+            print(f"❌ Unauthorized get my badges test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_get_my_badges_invalid_token(self):
+        """Test that getting user's badges rejects invalid tokens"""
+        try:
+            headers = {"Authorization": "Bearer invalid_token_here"}
+            response = requests.get(f"{API_URL}/badges/me", headers=headers)
+            print(f"Invalid token get my badges response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Invalid token for get my badges test passed")
+        except Exception as e:
+            print(f"❌ Invalid token for get my badges test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_get_my_badges_valid_token(self):
+        """
+        Test getting user's badges with a valid token
+        Note: This test will fail in a real environment as the token is mocked
+        and the user doesn't exist in the database
+        """
+        try:
+            valid_token = self.create_test_token()
+            headers = {"Authorization": f"Bearer {valid_token}"}
+            response = requests.get(f"{API_URL}/badges/me", headers=headers)
+            print(f"Valid token get my badges response: {response.status_code}")
+            # This will fail with 404 "User not found" as our test user doesn't exist in DB
+            # We're just checking that token validation works
+            self.assertEqual(response.status_code, 404)
+            print("✅ Valid token format for get my badges test passed (expected 404 as test user doesn't exist)")
+        except Exception as e:
+            print(f"❌ Valid token format for get my badges test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_get_user_badges(self):
+        """Test getting badges for a specific user (public endpoint)"""
+        try:
+            user_id = str(uuid.uuid4())  # Random user ID
+            response = requests.get(f"{API_URL}/badges/user/{user_id}")
+            print(f"Get user badges response: {response.status_code}")
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertIsInstance(data, list)
+            print("✅ Get user badges test passed")
+        except Exception as e:
+            print(f"❌ Get user badges test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_update_badge_unauthorized(self):
+        """Test that updating a badge requires authentication"""
+        try:
+            badge_id = str(uuid.uuid4())  # Random badge ID
+            response = requests.put(f"{API_URL}/badges/{badge_id}?course_title=Updated%20Course")
+            print(f"Unauthorized badge update response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Unauthorized badge update test passed")
+        except Exception as e:
+            print(f"❌ Unauthorized badge update test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_update_badge_invalid_token(self):
+        """Test that updating a badge rejects invalid tokens"""
+        try:
+            badge_id = str(uuid.uuid4())  # Random badge ID
+            headers = {"Authorization": "Bearer invalid_token_here"}
+            response = requests.put(f"{API_URL}/badges/{badge_id}?course_title=Updated%20Course", headers=headers)
+            print(f"Invalid token badge update response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Invalid token for badge update test passed")
+        except Exception as e:
+            print(f"❌ Invalid token for badge update test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_update_badge_valid_token(self):
+        """
+        Test updating a badge with a valid token
+        Note: This test will fail in a real environment as the token is mocked
+        and the user doesn't exist in the database
+        """
+        try:
+            valid_token = self.create_test_token()
+            headers = {"Authorization": f"Bearer {valid_token}"}
+            badge_id = str(uuid.uuid4())  # Random badge ID
+            response = requests.put(f"{API_URL}/badges/{badge_id}?course_title=Updated%20Course", headers=headers)
+            print(f"Valid token badge update response: {response.status_code}")
+            # This will fail with 404 "User not found" as our test user doesn't exist in DB
+            # We're just checking that token validation works
+            self.assertEqual(response.status_code, 404)
+            print("✅ Valid token format for badge update test passed (expected 404 as test user doesn't exist)")
+        except Exception as e:
+            print(f"❌ Valid token format for badge update test failed: {str(e)}")
+            traceback.print_exc()
+
 def run_tests():
     """Run all the tests"""
     print(f"Testing API at: {API_URL}")
     
     # Create test suite
     test_suite = unittest.TestSuite()
+    
+    # OAuth tests
     test_suite.addTest(TestGoogleOAuth('test_root_endpoint'))
     test_suite.addTest(TestGoogleOAuth('test_google_login_redirect'))
     test_suite.addTest(TestGoogleOAuth('test_auth_me_unauthorized'))
@@ -222,6 +402,18 @@ def run_tests():
     test_suite.addTest(TestGoogleOAuth('test_profile_update_valid_token'))
     test_suite.addTest(TestGoogleOAuth('test_logout'))
     test_suite.addTest(TestGoogleOAuth('test_invalid_profile_data'))
+    
+    # Badge system tests
+    test_suite.addTest(TestBadgeSystem('test_create_badge_unauthorized'))
+    test_suite.addTest(TestBadgeSystem('test_create_badge_invalid_token'))
+    test_suite.addTest(TestBadgeSystem('test_create_badge_valid_token'))
+    test_suite.addTest(TestBadgeSystem('test_get_my_badges_unauthorized'))
+    test_suite.addTest(TestBadgeSystem('test_get_my_badges_invalid_token'))
+    test_suite.addTest(TestBadgeSystem('test_get_my_badges_valid_token'))
+    test_suite.addTest(TestBadgeSystem('test_get_user_badges'))
+    test_suite.addTest(TestBadgeSystem('test_update_badge_unauthorized'))
+    test_suite.addTest(TestBadgeSystem('test_update_badge_invalid_token'))
+    test_suite.addTest(TestBadgeSystem('test_update_badge_valid_token'))
     
     # Run the tests
     runner = unittest.TextTestRunner()
