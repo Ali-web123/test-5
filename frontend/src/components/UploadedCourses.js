@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -8,27 +9,53 @@ const UploadedCourses = ({ userId, showTitle = true }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user, getAuthHeaders } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // For now, we'll show a placeholder since course creation isn't implemented yet
-    // In a real implementation, this would fetch courses created by the user
     const fetchUploadedCourses = async () => {
       try {
         setLoading(true);
-        // Placeholder - would typically be an API call like:
-        // const response = await fetch(`${BACKEND_URL}/api/courses/created`, { headers: getAuthHeaders() });
+        setError(null);
         
-        // Simulating an empty response for now
-        setCourses([]);
+        // Fetch courses created by the current user or specific user
+        const endpoint = userId 
+          ? `/api/courses/created/${userId}`
+          : '/api/courses/created';
+        
+        const headers = userId ? {} : getAuthHeaders();
+        
+        const response = await fetch(`${BACKEND_URL}${endpoint}`, { 
+          headers: {
+            'Content-Type': 'application/json',
+            ...headers
+          }
+        });
+        
+        if (response.ok) {
+          const coursesData = await response.json();
+          setCourses(coursesData);
+        } else if (response.status === 401) {
+          // User not authenticated
+          setCourses([]);
+        } else {
+          throw new Error(`Failed to fetch courses: ${response.status}`);
+        }
       } catch (err) {
+        console.error('Error fetching courses:', err);
         setError(err.message);
+        setCourses([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUploadedCourses();
-  }, [userId, user]);
+    if (user || userId) {
+      fetchUploadedCourses();
+    } else {
+      setLoading(false);
+      setCourses([]);
+    }
+  }, [userId, user, getAuthHeaders]);
 
   if (loading) {
     return (
