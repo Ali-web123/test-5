@@ -194,6 +194,67 @@ async def update_user_profile(
 async def logout():
     return {"message": "Logged out successfully"}
 
+# Badge endpoints
+@api_router.post("/badges", response_model=Badge)
+async def create_badge(
+    badge_data: BadgeCreate,
+    current_user: UserProfile = Depends(get_current_user)
+):
+    # Check if badge already exists for this user and course
+    existing_badge = await db.badges.find_one({
+        "user_id": current_user.id,
+        "course_id": badge_data.course_id,
+        "course_category": badge_data.course_category
+    })
+    
+    if existing_badge:
+        raise HTTPException(status_code=400, detail="Badge already earned for this course")
+    
+    # Create badge name and description based on course
+    badge_name = f"{badge_data.course_category.title()} Completion"
+    badge_description = f"Successfully completed course with {badge_data.quiz_score}% score"
+    
+    badge = Badge(
+        user_id=current_user.id,
+        course_id=badge_data.course_id,
+        course_title="",  # Will be filled by frontend
+        course_category=badge_data.course_category,
+        badge_name=badge_name,
+        badge_description=badge_description,
+        quiz_score=badge_data.quiz_score
+    )
+    
+    await db.badges.insert_one(badge.dict())
+    return badge
+
+@api_router.get("/badges/me", response_model=List[Badge])
+async def get_my_badges(current_user: UserProfile = Depends(get_current_user)):
+    badges = await db.badges.find({"user_id": current_user.id}).to_list(1000)
+    return [Badge(**badge) for badge in badges]
+
+@api_router.get("/badges/user/{user_id}", response_model=List[Badge])
+async def get_user_badges(user_id: str):
+    badges = await db.badges.find({"user_id": user_id}).to_list(1000)
+    return [Badge(**badge) for badge in badges]
+
+@api_router.put("/badges/{badge_id}", response_model=Badge)
+async def update_badge_course_title(
+    badge_id: str,
+    course_title: str,
+    current_user: UserProfile = Depends(get_current_user)
+):
+    # Update badge with course title
+    await db.badges.update_one(
+        {"id": badge_id, "user_id": current_user.id},
+        {"$set": {"course_title": course_title}}
+    )
+    
+    updated_badge = await db.badges.find_one({"id": badge_id})
+    if not updated_badge:
+        raise HTTPException(status_code=404, detail="Badge not found")
+    
+    return Badge(**updated_badge)
+
 # Existing routes
 @api_router.get("/")
 async def root():
