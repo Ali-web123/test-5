@@ -64,11 +64,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const getAuthHeaders = () => {
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
   const value = {
     user,
     login,
     logout,
     updateProfile,
+    getAuthHeaders,
     loading,
     isAuthenticated: !!user
   };
