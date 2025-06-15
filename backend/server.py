@@ -59,6 +59,23 @@ class UserProfileUpdate(BaseModel):
     about_me: Optional[str] = None
     age: Optional[int] = None
 
+# Badge Models
+class Badge(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    course_id: int
+    course_title: str
+    course_category: str  # masterclasses, careerpaths, crashcourses
+    badge_name: str
+    badge_description: str
+    earned_at: datetime = Field(default_factory=datetime.utcnow)
+    quiz_score: int
+
+class BadgeCreate(BaseModel):
+    course_id: int
+    course_category: str
+    quiz_score: int
+
 class StatusCheck(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     client_name: str
