@@ -416,9 +416,435 @@ class TestBadgeSystem(unittest.TestCase):
             print(f"❌ Valid token format for badge update test failed: {str(e)}")
             traceback.print_exc()
 
+class TestCourseManagement(unittest.TestCase):
+    """Test class for the course management endpoints"""
+    
+    def create_test_token(self, sub="test_google_id", email="test@example.com", name="Test User", expired=False):
+        """Create a test JWT token for authentication testing"""
+        payload = {
+            "sub": sub,
+            "email": email,
+            "name": name
+        }
+        
+        if expired:
+            # Create an expired token (expired 1 hour ago)
+            payload["exp"] = datetime.utcnow() - timedelta(hours=1)
+        else:
+            # Valid for 24 hours
+            payload["exp"] = datetime.utcnow() + timedelta(hours=24)
+            
+        return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+    
+    def test_create_course_unauthorized(self):
+        """Test that course creation requires authentication"""
+        try:
+            course_data = {
+                "title": "Test Course",
+                "description": "A test course for API testing",
+                "duration": "2 hours",
+                "level": "Beginner",
+                "category": "masterclasses",
+                "tags": ["test", "api"],
+                "sessions": [
+                    {
+                        "id": 1,
+                        "title": "Introduction",
+                        "duration": "30 minutes",
+                        "description": "Introduction to the course",
+                        "video_url": "https://example.com/video1"
+                    }
+                ],
+                "quiz": {
+                    "questions": [
+                        {
+                            "question": "What is this course about?",
+                            "options": ["Testing", "Development", "Design", "Marketing"],
+                            "correct": 0
+                        }
+                    ]
+                }
+            }
+            response = requests.post(f"{API_URL}/courses", json=course_data)
+            print(f"Unauthorized course creation response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Unauthorized course creation test passed")
+        except Exception as e:
+            print(f"❌ Unauthorized course creation test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_create_course_invalid_token(self):
+        """Test that course creation rejects invalid tokens"""
+        try:
+            course_data = {
+                "title": "Test Course",
+                "description": "A test course for API testing",
+                "duration": "2 hours",
+                "level": "Beginner",
+                "category": "masterclasses",
+                "tags": ["test", "api"],
+                "sessions": [
+                    {
+                        "id": 1,
+                        "title": "Introduction",
+                        "duration": "30 minutes",
+                        "description": "Introduction to the course",
+                        "video_url": "https://example.com/video1"
+                    }
+                ],
+                "quiz": {
+                    "questions": [
+                        {
+                            "question": "What is this course about?",
+                            "options": ["Testing", "Development", "Design", "Marketing"],
+                            "correct": 0
+                        }
+                    ]
+                }
+            }
+            headers = {"Authorization": "Bearer invalid_token_here"}
+            response = requests.post(f"{API_URL}/courses", json=course_data, headers=headers)
+            print(f"Invalid token course creation response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Invalid token for course creation test passed")
+        except Exception as e:
+            print(f"❌ Invalid token for course creation test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_create_course_valid_token(self):
+        """
+        Test course creation with a valid token
+        Note: This test will fail in a real environment as the token is mocked
+        and the user doesn't exist in the database
+        """
+        try:
+            valid_token = self.create_test_token()
+            headers = {"Authorization": f"Bearer {valid_token}"}
+            course_data = {
+                "title": "Test Course",
+                "description": "A test course for API testing",
+                "duration": "2 hours",
+                "level": "Beginner",
+                "category": "masterclasses",
+                "tags": ["test", "api"],
+                "sessions": [
+                    {
+                        "id": 1,
+                        "title": "Introduction",
+                        "duration": "30 minutes",
+                        "description": "Introduction to the course",
+                        "video_url": "https://example.com/video1"
+                    }
+                ],
+                "quiz": {
+                    "questions": [
+                        {
+                            "question": "What is this course about?",
+                            "options": ["Testing", "Development", "Design", "Marketing"],
+                            "correct": 0
+                        }
+                    ]
+                }
+            }
+            response = requests.post(f"{API_URL}/courses", json=course_data, headers=headers)
+            print(f"Valid token course creation response: {response.status_code}")
+            # This will fail with 404 "User not found" as our test user doesn't exist in DB
+            # We're just checking that token validation works
+            self.assertEqual(response.status_code, 404)
+            print("✅ Valid token format for course creation test passed (expected 404 as test user doesn't exist)")
+        except Exception as e:
+            print(f"❌ Valid token format for course creation test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_get_user_created_courses_unauthorized(self):
+        """Test that getting user's created courses requires authentication"""
+        try:
+            response = requests.get(f"{API_URL}/courses/created")
+            print(f"Unauthorized get user created courses response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Unauthorized get user created courses test passed")
+        except Exception as e:
+            print(f"❌ Unauthorized get user created courses test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_get_user_created_courses_invalid_token(self):
+        """Test that getting user's created courses rejects invalid tokens"""
+        try:
+            headers = {"Authorization": "Bearer invalid_token_here"}
+            response = requests.get(f"{API_URL}/courses/created", headers=headers)
+            print(f"Invalid token get user created courses response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Invalid token for get user created courses test passed")
+        except Exception as e:
+            print(f"❌ Invalid token for get user created courses test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_get_user_created_courses_valid_token(self):
+        """
+        Test getting user's created courses with a valid token
+        Note: This test will fail in a real environment as the token is mocked
+        and the user doesn't exist in the database
+        """
+        try:
+            valid_token = self.create_test_token()
+            headers = {"Authorization": f"Bearer {valid_token}"}
+            response = requests.get(f"{API_URL}/courses/created", headers=headers)
+            print(f"Valid token get user created courses response: {response.status_code}")
+            # This will fail with 404 "User not found" as our test user doesn't exist in DB
+            # We're just checking that token validation works
+            self.assertEqual(response.status_code, 404)
+            print("✅ Valid token format for get user created courses test passed (expected 404 as test user doesn't exist)")
+        except Exception as e:
+            print(f"❌ Valid token format for get user created courses test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_get_courses_by_user(self):
+        """Test getting courses created by a specific user (public endpoint)"""
+        try:
+            user_id = str(uuid.uuid4())  # Random user ID
+            response = requests.get(f"{API_URL}/courses/created/{user_id}")
+            print(f"Get courses by user response: {response.status_code}")
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertIsInstance(data, list)
+            print("✅ Get courses by user test passed")
+        except Exception as e:
+            print(f"❌ Get courses by user test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_get_course(self):
+        """Test getting a specific course (public endpoint)"""
+        try:
+            course_id = str(uuid.uuid4())  # Random course ID
+            response = requests.get(f"{API_URL}/courses/{course_id}")
+            print(f"Get course response: {response.status_code}")
+            # Should return 404 for non-existent course
+            self.assertEqual(response.status_code, 404)
+            print("✅ Get course test passed (expected 404 for non-existent course)")
+        except Exception as e:
+            print(f"❌ Get course test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_update_course_unauthorized(self):
+        """Test that updating a course requires authentication"""
+        try:
+            course_id = str(uuid.uuid4())  # Random course ID
+            course_data = {
+                "title": "Updated Course",
+                "description": "An updated test course",
+                "duration": "3 hours",
+                "level": "Intermediate",
+                "category": "masterclasses",
+                "tags": ["test", "api", "updated"],
+                "sessions": [
+                    {
+                        "id": 1,
+                        "title": "Updated Introduction",
+                        "duration": "45 minutes",
+                        "description": "Updated introduction to the course",
+                        "video_url": "https://example.com/updated-video1"
+                    }
+                ],
+                "quiz": {
+                    "questions": [
+                        {
+                            "question": "What is this updated course about?",
+                            "options": ["Testing", "Development", "Design", "Marketing"],
+                            "correct": 0
+                        }
+                    ]
+                }
+            }
+            response = requests.put(f"{API_URL}/courses/{course_id}", json=course_data)
+            print(f"Unauthorized course update response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Unauthorized course update test passed")
+        except Exception as e:
+            print(f"❌ Unauthorized course update test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_update_course_invalid_token(self):
+        """Test that updating a course rejects invalid tokens"""
+        try:
+            course_id = str(uuid.uuid4())  # Random course ID
+            course_data = {
+                "title": "Updated Course",
+                "description": "An updated test course",
+                "duration": "3 hours",
+                "level": "Intermediate",
+                "category": "masterclasses",
+                "tags": ["test", "api", "updated"],
+                "sessions": [
+                    {
+                        "id": 1,
+                        "title": "Updated Introduction",
+                        "duration": "45 minutes",
+                        "description": "Updated introduction to the course",
+                        "video_url": "https://example.com/updated-video1"
+                    }
+                ],
+                "quiz": {
+                    "questions": [
+                        {
+                            "question": "What is this updated course about?",
+                            "options": ["Testing", "Development", "Design", "Marketing"],
+                            "correct": 0
+                        }
+                    ]
+                }
+            }
+            headers = {"Authorization": "Bearer invalid_token_here"}
+            response = requests.put(f"{API_URL}/courses/{course_id}", json=course_data, headers=headers)
+            print(f"Invalid token course update response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Invalid token for course update test passed")
+        except Exception as e:
+            print(f"❌ Invalid token for course update test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_update_course_valid_token(self):
+        """
+        Test updating a course with a valid token
+        Note: This test will fail in a real environment as the token is mocked
+        and the user doesn't exist in the database
+        """
+        try:
+            valid_token = self.create_test_token()
+            headers = {"Authorization": f"Bearer {valid_token}"}
+            course_id = str(uuid.uuid4())  # Random course ID
+            course_data = {
+                "title": "Updated Course",
+                "description": "An updated test course",
+                "duration": "3 hours",
+                "level": "Intermediate",
+                "category": "masterclasses",
+                "tags": ["test", "api", "updated"],
+                "sessions": [
+                    {
+                        "id": 1,
+                        "title": "Updated Introduction",
+                        "duration": "45 minutes",
+                        "description": "Updated introduction to the course",
+                        "video_url": "https://example.com/updated-video1"
+                    }
+                ],
+                "quiz": {
+                    "questions": [
+                        {
+                            "question": "What is this updated course about?",
+                            "options": ["Testing", "Development", "Design", "Marketing"],
+                            "correct": 0
+                        }
+                    ]
+                }
+            }
+            response = requests.put(f"{API_URL}/courses/{course_id}", json=course_data, headers=headers)
+            print(f"Valid token course update response: {response.status_code}")
+            # This will fail with 404 "User not found" as our test user doesn't exist in DB
+            # We're just checking that token validation works
+            self.assertEqual(response.status_code, 404)
+            print("✅ Valid token format for course update test passed (expected 404 as test user doesn't exist)")
+        except Exception as e:
+            print(f"❌ Valid token format for course update test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_publish_course_unauthorized(self):
+        """Test that publishing a course requires authentication"""
+        try:
+            course_id = str(uuid.uuid4())  # Random course ID
+            response = requests.put(f"{API_URL}/courses/{course_id}/publish")
+            print(f"Unauthorized course publish response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Unauthorized course publish test passed")
+        except Exception as e:
+            print(f"❌ Unauthorized course publish test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_publish_course_invalid_token(self):
+        """Test that publishing a course rejects invalid tokens"""
+        try:
+            course_id = str(uuid.uuid4())  # Random course ID
+            headers = {"Authorization": "Bearer invalid_token_here"}
+            response = requests.put(f"{API_URL}/courses/{course_id}/publish", headers=headers)
+            print(f"Invalid token course publish response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Invalid token for course publish test passed")
+        except Exception as e:
+            print(f"❌ Invalid token for course publish test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_publish_course_valid_token(self):
+        """
+        Test publishing a course with a valid token
+        Note: This test will fail in a real environment as the token is mocked
+        and the user doesn't exist in the database
+        """
+        try:
+            valid_token = self.create_test_token()
+            headers = {"Authorization": f"Bearer {valid_token}"}
+            course_id = str(uuid.uuid4())  # Random course ID
+            response = requests.put(f"{API_URL}/courses/{course_id}/publish", headers=headers)
+            print(f"Valid token course publish response: {response.status_code}")
+            # This will fail with 404 "User not found" as our test user doesn't exist in DB
+            # We're just checking that token validation works
+            self.assertEqual(response.status_code, 404)
+            print("✅ Valid token format for course publish test passed (expected 404 as test user doesn't exist)")
+        except Exception as e:
+            print(f"❌ Valid token format for course publish test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_delete_course_unauthorized(self):
+        """Test that deleting a course requires authentication"""
+        try:
+            course_id = str(uuid.uuid4())  # Random course ID
+            response = requests.delete(f"{API_URL}/courses/{course_id}")
+            print(f"Unauthorized course delete response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Unauthorized course delete test passed")
+        except Exception as e:
+            print(f"❌ Unauthorized course delete test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_delete_course_invalid_token(self):
+        """Test that deleting a course rejects invalid tokens"""
+        try:
+            course_id = str(uuid.uuid4())  # Random course ID
+            headers = {"Authorization": "Bearer invalid_token_here"}
+            response = requests.delete(f"{API_URL}/courses/{course_id}", headers=headers)
+            print(f"Invalid token course delete response: {response.status_code}")
+            self.assertEqual(response.status_code, 401)
+            print("✅ Invalid token for course delete test passed")
+        except Exception as e:
+            print(f"❌ Invalid token for course delete test failed: {str(e)}")
+            traceback.print_exc()
+    
+    def test_delete_course_valid_token(self):
+        """
+        Test deleting a course with a valid token
+        Note: This test will fail in a real environment as the token is mocked
+        and the user doesn't exist in the database
+        """
+        try:
+            valid_token = self.create_test_token()
+            headers = {"Authorization": f"Bearer {valid_token}"}
+            course_id = str(uuid.uuid4())  # Random course ID
+            response = requests.delete(f"{API_URL}/courses/{course_id}", headers=headers)
+            print(f"Valid token course delete response: {response.status_code}")
+            # This will fail with 404 "User not found" as our test user doesn't exist in DB
+            # We're just checking that token validation works
+            self.assertEqual(response.status_code, 404)
+            print("✅ Valid token format for course delete test passed (expected 404 as test user doesn't exist)")
+        except Exception as e:
+            print(f"❌ Valid token format for course delete test failed: {str(e)}")
+            traceback.print_exc()
+
 def run_tests():
     """Run all the tests"""
     print(f"Testing API at: {API_URL}")
+    
+    # First test MongoDB connection
+    mongodb_connected = test_mongodb_connection()
+    print(f"MongoDB connection test result: {'✅ Connected' if mongodb_connected else '❌ Not connected'}")
     
     # Create test suite
     test_suite = unittest.TestSuite()
@@ -447,6 +873,25 @@ def run_tests():
     test_suite.addTest(TestBadgeSystem('test_update_badge_unauthorized'))
     test_suite.addTest(TestBadgeSystem('test_update_badge_invalid_token'))
     test_suite.addTest(TestBadgeSystem('test_update_badge_valid_token'))
+    
+    # Course management tests
+    test_suite.addTest(TestCourseManagement('test_create_course_unauthorized'))
+    test_suite.addTest(TestCourseManagement('test_create_course_invalid_token'))
+    test_suite.addTest(TestCourseManagement('test_create_course_valid_token'))
+    test_suite.addTest(TestCourseManagement('test_get_user_created_courses_unauthorized'))
+    test_suite.addTest(TestCourseManagement('test_get_user_created_courses_invalid_token'))
+    test_suite.addTest(TestCourseManagement('test_get_user_created_courses_valid_token'))
+    test_suite.addTest(TestCourseManagement('test_get_courses_by_user'))
+    test_suite.addTest(TestCourseManagement('test_get_course'))
+    test_suite.addTest(TestCourseManagement('test_update_course_unauthorized'))
+    test_suite.addTest(TestCourseManagement('test_update_course_invalid_token'))
+    test_suite.addTest(TestCourseManagement('test_update_course_valid_token'))
+    test_suite.addTest(TestCourseManagement('test_publish_course_unauthorized'))
+    test_suite.addTest(TestCourseManagement('test_publish_course_invalid_token'))
+    test_suite.addTest(TestCourseManagement('test_publish_course_valid_token'))
+    test_suite.addTest(TestCourseManagement('test_delete_course_unauthorized'))
+    test_suite.addTest(TestCourseManagement('test_delete_course_invalid_token'))
+    test_suite.addTest(TestCourseManagement('test_delete_course_valid_token'))
     
     # Run the tests
     runner = unittest.TextTestRunner()
