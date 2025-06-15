@@ -95,7 +95,10 @@ const UploadedCourses = ({ userId, showTitle = true }) => {
               {userId ? 'This user hasn\'t created any courses yet.' : 'You haven\'t created any courses yet.'}
             </p>
             {!userId && (
-              <button className="mt-4 glass-button bg-blue-500/20 border-blue-400 text-blue-300 hover:bg-blue-500/30">
+              <button 
+                onClick={() => navigate('/upload-course')}
+                className="mt-4 glass-button bg-blue-500/20 border-blue-400 text-blue-300 hover:bg-blue-500/30"
+              >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                 </svg>
