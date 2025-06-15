@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Badge = ({ badge, onClick, size = 'md' }) => {
+const Badge = ({ badge, onClick, size = 'md', showTitle = false }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -24,40 +24,32 @@ const Badge = ({ badge, onClick, size = 'md' }) => {
     }
   };
 
-  const getBadgeColor = () => {
-    if (badge.quiz_score >= 90) return 'from-yellow-400 to-yellow-600'; // Gold
-    if (badge.quiz_score >= 80) return 'from-gray-300 to-gray-500'; // Silver
-    if (badge.quiz_score >= 70) return 'from-amber-600 to-amber-800'; // Bronze
-    return 'from-blue-400 to-blue-600'; // Default blue
-  };
-
-  const getBadgeIcon = () => {
-    if (badge.quiz_score >= 90) return '🏆'; // Trophy for gold
-    if (badge.quiz_score >= 80) return '🥈'; // Silver medal
-    if (badge.quiz_score >= 70) return '🥉'; // Bronze medal
-    return '🎖️'; // Default medal
-  };
-
   return (
-    <div
-      onClick={handleClick}
-      className={`${getSizeClasses()} relative cursor-pointer group transition-all duration-300 hover:scale-110`}
-      title={`${badge.badge_name} - ${badge.course_title} (${badge.quiz_score}%)`}
-    >
-      {/* Badge Circle */}
-      <div className={`w-full h-full rounded-full bg-gradient-to-br ${getBadgeColor()} flex items-center justify-center shadow-lg border-2 border-white/20`}>
-        <span className="text-white font-bold">
-          {getBadgeIcon()}
-        </span>
+    <div className="flex flex-col items-center">
+      <div
+        onClick={handleClick}
+        className={`${getSizeClasses()} relative cursor-pointer group transition-all duration-300 hover:scale-110`}
+        title={`${badge.badge_name} - ${badge.course_title}`}
+      >
+        {/* Badge Circle - Uniform blue design */}
+        <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg border-2 border-white/20">
+          <span className="text-white font-bold text-2xl">
+            🎖️
+          </span>
+        </div>
+        
+        {/* Badge Shine Effect */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </div>
       
-      {/* Badge Shine Effect */}
-      <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      
-      {/* Score Badge */}
-      <div className="absolute -top-1 -right-1 bg-white text-black text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-gray-200">
-        {badge.quiz_score}
-      </div>
+      {/* Course Title */}
+      {showTitle && (
+        <div className="mt-2 text-center">
+          <p className="text-white text-xs font-medium leading-tight max-w-20 break-words">
+            {badge.course_title}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
