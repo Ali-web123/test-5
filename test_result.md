@@ -312,9 +312,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Google OAuth Integration Setup"
-    - "JWT Authentication System" 
-    - "MongoDB Connection"
     - "Google OAuth Integration Frontend"
     - "Authentication Context"
     - "OAuth Callback Handler"
