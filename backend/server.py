@@ -76,6 +76,48 @@ class BadgeCreate(BaseModel):
     course_category: str
     quiz_score: int
 
+# Course Models
+class CourseSession(BaseModel):
+    id: int
+    title: str
+    duration: str
+    description: str
+    video_url: Optional[str] = ""
+
+class QuizQuestion(BaseModel):
+    question: str
+    options: List[str]
+    correct: int
+
+class Quiz(BaseModel):
+    questions: List[QuizQuestion]
+
+class Course(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    description: str
+    duration: str
+    instructor: str
+    level: str  # Beginner, Intermediate, Advanced, Expert, All Levels
+    category: str  # masterclasses, careerpaths, crashcourses
+    tags: List[str]
+    sessions: List[CourseSession]
+    quiz: Quiz
+    created_by: str  # user_id
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    published: bool = False
+    views: int = 0
+
+class CourseCreate(BaseModel):
+    title: str
+    description: str
+    duration: str
+    level: str
+    category: str
+    tags: List[str]
+    sessions: List[CourseSession]
+    quiz: Quiz
+
 class StatusCheck(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     client_name: str
