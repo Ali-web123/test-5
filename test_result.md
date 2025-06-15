@@ -182,15 +182,18 @@ backend:
 
   - task: "MongoDB Connection"
     implemented: true
-    working: "needs_testing"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "needs_testing"
         agent: "main"
         comment: "MongoDB connection established using Motor async driver. Database configured with proper environment variables."
+      - working: true
+        agent: "testing"
+        comment: "MongoDB connection is working correctly. Successfully tested by creating and retrieving status checks through the /api/status endpoint. The database is properly configured and accessible."
 
   - task: "Dependencies Installation"
     implemented: true
