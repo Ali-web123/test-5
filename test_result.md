@@ -218,7 +218,7 @@ frontend:
     status_history:
       - working: true
         agent: "main"
-        comment: "Integrated BadgeCollection into user profile page"
+        comment: "Integrated BadgeCollection and UploadedCourses components into user profile page"
 
   - task: "Quiz Completion Badge Awarding"
     implemented: true
