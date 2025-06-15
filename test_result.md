@@ -152,15 +152,18 @@ backend:
 
   - task: "Badge/Achievement System API"
     implemented: true
-    working: "needs_testing"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "needs_testing"
         agent: "main"
         comment: "Badge creation and retrieval system for course completion. Awards badges based on quiz scores >= 60%."
+      - working: true
+        agent: "testing"
+        comment: "Badge system API is working correctly. The /api/badges endpoint creates badges for authenticated users. The /api/badges/me endpoint returns badges for the current user. The /api/badges/user/{user_id} endpoint returns badges for a specific user. The /api/badges/{badge_id} endpoint updates badge course titles."
 
   - task: "Course Management API"
     implemented: true
